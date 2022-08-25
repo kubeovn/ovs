@@ -359,6 +359,7 @@ monitor_daemon(pid_t daemon_pid)
         ovs_cmdl_proctitle_set("monitoring pid %lu (%s)",
                                (unsigned long int) daemon_pid, status_msg);
 
+        vlog_close_log_file();
         if (child_ready) {
             int error;
             do {

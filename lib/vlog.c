@@ -439,6 +439,24 @@ vlog_reopen_log_file(void)
     }
 }
 
+void
+vlog_close_log_file(void) {
+    ovs_mutex_lock(&log_file_mutex);
+    if (log_fd >= 0) {
+        close(log_fd);
+        log_fd = -1;
+
+        async_append_destroy(log_writer);
+        log_writer = NULL;
+
+        struct vlog_module *mp;
+        LIST_FOR_EACH (mp, list, &vlog_modules) {
+            update_min_level(mp);
+        }
+    }
+    ovs_mutex_unlock(&log_file_mutex);
+}
+
 #ifndef _WIN32
 /* In case a log file exists, change its owner to new 'user' and 'group'.
  *
