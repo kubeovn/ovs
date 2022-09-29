@@ -1793,7 +1793,8 @@ struct ofproto_class {
      * An implementation that doesn't support configuring these features may
      * set this function to NULL or implement it as a no-op. */
     void (*set_mac_table_config)(struct ofproto *ofproto,
-                                 unsigned int idle_time, size_t max_entries);
+                                 unsigned int idle_time,
+                                 bool fallback, size_t max_entries);
 
     /* Configures multicast snooping on 'ofport' using the settings
      * defined in 's'.
