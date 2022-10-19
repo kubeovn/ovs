@@ -58,6 +58,9 @@ static const char *rbac_role;
 /* --cid: Cluster ID for "join-cluster" command. */
 static struct uuid cid;
 
+/* --sid: Server ID for "join-cluster" command. */
+static struct uuid sid;
+
 /* --election-timer: Election timer for "create-cluster" command. */
 static uint64_t election_timer;
 
@@ -89,12 +92,14 @@ parse_options(int argc, char *argv[])
     enum {
         OPT_RBAC_ROLE = UCHAR_MAX + 1,
         OPT_CID,
+        OPT_SID,
         OPT_ELECTION_TIMER,
     };
     static const struct option long_options[] = {
         {"more", no_argument, NULL, 'm'},
         {"rbac-role", required_argument, NULL, OPT_RBAC_ROLE},
         {"cid", required_argument, NULL, OPT_CID},
+        {"sid", required_argument, NULL, OPT_SID},
         {"election-timer", required_argument, NULL, OPT_ELECTION_TIMER},
         {"verbose", optional_argument, NULL, 'v'},
         {"help", no_argument, NULL, 'h'},
@@ -124,6 +129,12 @@ parse_options(int argc, char *argv[])
 
         case OPT_CID:
             if (!uuid_from_string(&cid, optarg) || uuid_is_zero(&cid)) {
+                ovs_fatal(0, "%s: not a valid UUID", optarg);
+            }
+            break;
+
+        case OPT_SID:
+            if (!uuid_from_string(&sid, optarg) || uuid_is_zero(&sid)) {
                 ovs_fatal(0, "%s: not a valid UUID", optarg);
             }
             break;
@@ -169,7 +180,7 @@ usage(void)
            "  create [DB [SCHEMA]]    create DB with the given SCHEMA\n"
            "  [--election-timer=ms] create-cluster DB CONTENTS LOCAL\n"
            "    create clustered DB with given CONTENTS and LOCAL address\n"
-           "  [--cid=UUID] join-cluster DB NAME LOCAL REMOTE...\n"
+           "  [--cid=UUID] [--sid=UUID] join-cluster DB NAME LOCAL REMOTE...\n"
            "    join clustered DB with given NAME and LOCAL and REMOTE addrs\n"
            "  compact [DB [DST]]      compact DB in-place (or to DST)\n"
            "  convert [DB [SCHEMA [DST]]]   convert DB to SCHEMA (to DST)\n"
@@ -342,7 +353,8 @@ do_join_cluster(struct ovs_cmdl_context *ctx)
     }
     check_ovsdb_error(raft_join_cluster(db_file_name, name, local,
                                         &remote_addrs,
-                                        uuid_is_zero(&cid) ? NULL : &cid));
+                                        uuid_is_zero(&cid) ? NULL : &cid,
+                                        uuid_is_zero(&sid) ? NULL : &sid));
     sset_destroy(&remote_addrs);
 }
 

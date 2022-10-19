@@ -86,7 +86,8 @@ struct ovsdb_error *raft_create_cluster(const char *file_name,
 struct ovsdb_error *raft_join_cluster(const char *file_name, const char *name,
                                       const char *local_address,
                                       const struct sset *remote_addrs,
-                                      const struct uuid *cid)
+                                      const struct uuid *cid,
+                                      const struct uuid *sid)
     OVS_WARN_UNUSED_RESULT;
 
 /* Reading metadata from a server log. */
