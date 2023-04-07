@@ -375,6 +375,7 @@ dpif_netlink_open(const struct dpif_class *class OVS_UNUSED, const char *name,
 
         error = dpif_netlink_dp_transact(&dp_request, &dp, &buf);
         if (error) {
+            ofpbuf_delete(buf);
             return error;
         }
         dp_request.user_features = dp.user_features;
@@ -414,13 +415,16 @@ dpif_netlink_open(const struct dpif_class *class OVS_UNUSED, const char *name,
         dp_request.user_features |= OVS_DP_F_UNALIGNED;
         dp_request.user_features &= ~OVS_DP_F_VPORT_PIDS;
         dp_request.user_features |= OVS_DP_F_DISPATCH_UPCALL_PER_CPU;
+        ofpbuf_delete(buf);
         error = dpif_netlink_dp_transact(&dp_request, &dp, &buf);
         if (error) {
             dp_request.user_features &= ~OVS_DP_F_DISPATCH_UPCALL_PER_CPU;
             dp_request.user_features |= OVS_DP_F_VPORT_PIDS;
+            ofpbuf_delete(buf);
             error = dpif_netlink_dp_transact(&dp_request, &dp, &buf);
         }
         if (error) {
+            ofpbuf_delete(buf);
             return error;
         }
 
@@ -433,8 +437,10 @@ dpif_netlink_open(const struct dpif_class *class OVS_UNUSED, const char *name,
         dp_request.user_features = 0;
         dp_request.user_features |= OVS_DP_F_UNALIGNED;
         dp_request.user_features |= OVS_DP_F_VPORT_PIDS;
+        ofpbuf_delete(buf);
         error = dpif_netlink_dp_transact(&dp_request, &dp, &buf);
         if (error) {
+            ofpbuf_delete(buf);
             return error;
         }
         error = open_dpif(&dp, dpifp);
