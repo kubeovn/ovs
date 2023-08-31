@@ -28,6 +28,7 @@
 #include "openvswitch/dynamic-string.h"
 #include "fatal-signal.h"
 #include "hash.h"
+#include "jsonrpc.h"
 #include "openvswitch/json.h"
 #include "openvswitch/vlog.h"
 #include "ovsdb-data.h"
@@ -2419,7 +2420,7 @@ ctl_default_db(void)
 {
     static char *def;
     if (!def) {
-        def = xasprintf("unix:%s/db.sock", ovs_rundir());
+        def = xasprintf("tcp:127.0.0.1:%d", OVSDB_PORT);
     }
     return def;
 }

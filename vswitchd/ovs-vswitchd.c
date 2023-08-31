@@ -33,6 +33,7 @@
 #include "dpif.h"
 #include "dummy.h"
 #include "fatal-signal.h"
+#include "jsonrpc.h"
 #include "memory.h"
 #include "netdev.h"
 #include "openflow/openflow.h"
@@ -264,7 +265,7 @@ parse_options(int argc, char *argv[], char **unixctl_pathp)
 
     switch (argc) {
     case 0:
-        return xasprintf("unix:%s/db.sock", ovs_rundir());
+        return xasprintf("tcp:127.0.0.1:%d", OVSDB_PORT);
 
     case 1:
         return xstrdup(argv[0]);
@@ -281,8 +282,8 @@ usage(void)
     printf("%s: Open vSwitch daemon\n"
            "usage: %s [OPTIONS] [DATABASE]\n"
            "where DATABASE is a socket on which ovsdb-server is listening\n"
-           "      (default: \"unix:%s/db.sock\").\n",
-           program_name, program_name, ovs_rundir());
+           "      (default: \"tcp:127.0.0.1:%d\").\n",
+           program_name, program_name, OVSDB_PORT);
     stream_usage("DATABASE", true, false, true);
     daemon_usage();
     vlog_usage();

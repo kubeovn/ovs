@@ -189,7 +189,7 @@
     <Component Id="OvsdbServerService" Directory="BINARIESDIR" Guid="{280201D5-35E7-45D6-83B9-293F1A4F7F0E}">
       <File Id="ovsdbserver.exe" Source="Services\ovsdb-server.exe" Checksum="yes" />
       <ServiceInstall
-                Arguments='--log-file="[LOGSDIR]ovsdb-server.log" --pidfile="[APPDATADIR]ovsdb-server.pid" --service --service-monitor --unixctl="[APPDATADIR]ovsdb-server.ctl" --remote=punix:"[APPDATADIR]db.sock" "[CONFDIR]conf.db"'
+                Arguments='--log-file="[LOGSDIR]ovsdb-server.log" --pidfile="[APPDATADIR]ovsdb-server.pid" --service --service-monitor --unixctl="[APPDATADIR]ovsdb-server.ctl" --remote=ptcp:6640:127.0.0.1 "[CONFDIR]conf.db"'
                 Id="OvsdbServerServiceInstaller"
                 Type="ownProcess"
                 Vital="yes"
@@ -220,7 +220,7 @@
     <Component Id="OvsVSwitchdService" Directory="BINARIESDIR" Guid="{A2ED5531-B2D7-4CD3-8ADE-B525A8BEB957}">
       <File Id="ovsvswitchd.exe" Source="Services\ovs-vswitchd.exe" Checksum="yes" />
       <ServiceInstall
-                Arguments='--log-file="[LOGSDIR]ovs-vswitchd.log" unix:"[APPDATADIR]db.sock" --unixctl="[APPDATADIR]ovs-vswitchd.ctl" --pidfile="[APPDATADIR]ovs-vswitchd.pid" --service --service-monitor'
+                Arguments='--log-file="[LOGSDIR]ovs-vswitchd.log" tcp:127.0.0.1:6640 --unixctl="[APPDATADIR]ovs-vswitchd.ctl" --pidfile="[APPDATADIR]ovs-vswitchd.pid" --service --service-monitor'
                 Id="OvsVSwitchdServiceServiceInstaller"
                 Type="ownProcess"
                 Vital="yes"

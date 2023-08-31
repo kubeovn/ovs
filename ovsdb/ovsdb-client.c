@@ -116,7 +116,7 @@ struct jsonrpc_msg *create_database_info_request(const char *database);
 static char *
 default_remote(void)
 {
-    return xasprintf("unix:%s/db.sock", ovs_rundir());
+    return xasprintf("ptcp:%d:127.0.0.1", OVSDB_PORT);
 }
 
 static int
@@ -463,9 +463,9 @@ usage(void)
            "    steal LOCK from SERVER\n"
            "\n  unlock [SERVER] LOCK\n"
            "    unlock LOCK from SERVER\n"
-           "\nThe default SERVER is unix:%s/db.sock.\n"
+           "\nThe default SERVER is tcp:127.0.0.1:%d.\n"
            "The default DATABASE is Open_vSwitch.\n",
-           program_name, program_name, ovs_rundir());
+           program_name, program_name, OVSDB_PORT);
     stream_usage("SERVER", true, true, true);
     table_usage();
     printf("  --timestamp                 timestamp \"monitor\" output");
