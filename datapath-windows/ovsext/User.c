@@ -271,6 +271,7 @@ OvsNlExecuteCmdHandler(POVS_USER_PARAMS_CONTEXT usrParamsCtx,
 {
     NTSTATUS status = STATUS_SUCCESS;
     POVS_MESSAGE msgIn = (POVS_MESSAGE)usrParamsCtx->inputBuffer;
+    UINT32 inputLength = usrParamsCtx->inputLength;
     POVS_MESSAGE msgOut = (POVS_MESSAGE)usrParamsCtx->outputBuffer;
     PNL_MSG_HDR nlMsgHdr = &(msgIn->nlMsg);
     PGENL_MSG_HDR genlMsgHdr = &(msgIn->genlMsg);
@@ -280,7 +281,7 @@ OvsNlExecuteCmdHandler(POVS_USER_PARAMS_CONTEXT usrParamsCtx,
     PNL_ATTR keyAttrs[__OVS_KEY_ATTR_MAX] = {NULL};
 
     UINT32 attrOffset = NLMSG_HDRLEN + GENL_HDRLEN + OVS_HDRLEN;
-    UINT32 keyAttrOffset = 0;
+    UINT32 keyAttrOffset = 0, keyAttrLength = 0;
     OvsPacketExecute execute;
     NL_ERROR nlError = NL_ERROR_SUCCESS;
     NL_BUFFER nlBuf;
@@ -310,10 +311,11 @@ OvsNlExecuteCmdHandler(POVS_USER_PARAMS_CONTEXT usrParamsCtx,
 
     keyAttrOffset = (UINT32)((PCHAR)nlAttrs[OVS_PACKET_ATTR_KEY] -
                     (PCHAR)nlMsgHdr);
+    keyAttrLength = MIN(NlAttrLen(nlAttrs[OVS_PACKET_ATTR_KEY]),
+                        inputLength - keyAttrOffset);
 
     /* Get flow keys attributes */
-    if ((NlAttrParseNested(nlMsgHdr, keyAttrOffset,
-                           NlAttrLen(nlAttrs[OVS_PACKET_ATTR_KEY]),
+    if ((NlAttrParseNested(nlMsgHdr, keyAttrOffset, keyAttrLength,
                            nlFlowKeyPolicy, nlFlowKeyPolicyLen,
                            keyAttrs, ARRAY_SIZE(keyAttrs))) != TRUE) {
         OVS_LOG_ERROR("Key Attr Parsing failed for msg: %p", nlMsgHdr);
@@ -406,8 +408,11 @@ _MapNlAttrToOvsPktExec(PNL_MSG_HDR nlMsgHdr, PNL_ATTR *nlAttrs,
     execute->actions = NlAttrGet(nlAttrs[OVS_PACKET_ATTR_ACTIONS]);
     execute->actionsLen = NlAttrGetSize(nlAttrs[OVS_PACKET_ATTR_ACTIONS]);
 
-    ASSERT(keyAttrs[OVS_KEY_ATTR_IN_PORT]);
-    execute->inPort = NlAttrGetU32(keyAttrs[OVS_KEY_ATTR_IN_PORT]);
+    if (keyAttrs[OVS_KEY_ATTR_IN_PORT]) {
+        execute->inPort = NlAttrGetU32(keyAttrs[OVS_KEY_ATTR_IN_PORT]);
+    } else {
+        execute->inPort = execute->dpNo;
+    }
     execute->keyAttrs = keyAttrs;
 
     if (nlAttrs[OVS_PACKET_ATTR_MRU]) {
