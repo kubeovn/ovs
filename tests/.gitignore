@@ -68,6 +68,7 @@
 /test-unix-socket
 /test-util
 /test-uuid
+/test-uuidset
 /test-vconn
 /testsuite
 /testsuite.dir/
