@@ -67,6 +67,31 @@ enum { N_TABLES = 255 };
 enum { TBL_INTERNAL = N_TABLES - 1 };    /* Used for internal hidden rules. */
 BUILD_ASSERT_DECL(N_TABLES >= 2 && N_TABLES <= 255);
 
+struct ofbundle {
+    struct hmap_node hmap_node; /* In struct ofproto's "bundles" hmap. */
+    struct ofproto_dpif *ofproto; /* Owning ofproto. */
+    void *aux;                  /* Key supplied by ofproto's client. */
+    char *name;                 /* Identifier for log messages. */
+
+    /* Configuration. */
+    struct ovs_list ports;      /* Contains "struct ofport_dpif"s. */
+    enum port_vlan_mode vlan_mode; /* VLAN mode */
+    uint16_t qinq_ethtype;
+    int vlan;                   /* -1=trunk port, else a 12-bit VLAN ID. */
+    unsigned long *trunks;      /* Bitmap of trunked VLANs, if 'vlan' == -1.
+                                 * NULL if all VLANs are trunked. */
+    unsigned long *cvlans;
+    struct lacp *lacp;          /* LACP if LACP is enabled, otherwise NULL. */
+    struct bond *bond;          /* Nonnull iff more than one port. */
+    enum port_priority_tags_mode use_priority_tags;
+                                /* Use 802.1p tag for frames in VLAN 0? */
+
+    bool protected;             /* Protected port mode */
+
+    /* Status. */
+    bool floodable;          /* True if no port has OFPUTIL_PC_NO_FLOOD set. */
+};
+
 struct rule_dpif {
     struct rule up;
 

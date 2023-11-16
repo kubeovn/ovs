@@ -344,7 +344,7 @@ void ofproto_set_min_revalidate_pps(unsigned min_revalidate_pps);
 void ofproto_set_offloaded_stats_delay(unsigned offloaded_stats_delay);
 void ofproto_set_forward_bpdu(struct ofproto *, bool forward_bpdu);
 void ofproto_set_mac_table_config(struct ofproto *, unsigned idle_time,
-                                  size_t max_entries);
+                                  bool fallback, size_t max_entries);
 int ofproto_set_mcast_snooping(struct ofproto *ofproto,
                               const struct ofproto_mcast_snooping_settings *s);
 int ofproto_port_set_mcast_snooping(struct ofproto *ofproto, void *aux,
