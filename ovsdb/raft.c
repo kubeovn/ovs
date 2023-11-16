@@ -202,7 +202,7 @@ struct raft {
      * most recently added to 'log'. */
     struct hmap servers;
 
-#define ELECTION_BASE_MSEC 1000
+#define ELECTION_BASE_MSEC 5000
 #define ELECTION_RANGE_MSEC 1000
 #define ELECTION_MIN_MSEC 100
 #define ELECTION_MAX_MSEC 600000
