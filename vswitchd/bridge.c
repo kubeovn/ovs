@@ -18,6 +18,7 @@
 #include <errno.h>
 #include <inttypes.h>
 #include <stdlib.h>
+#include <malloc.h>
 
 #include "async-append.h"
 #include "bfd.h"
@@ -3218,6 +3219,7 @@ bridge_run__(void)
 void
 bridge_run(void)
 {
+    malloc_trim(0);
     static struct ovsrec_open_vswitch null_cfg;
     const struct ovsrec_open_vswitch *cfg;
 
