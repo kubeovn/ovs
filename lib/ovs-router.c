@@ -174,6 +174,11 @@ ovs_router_get_netdev_source_address(const struct in6_addr *ip6_dst,
     struct netdev *dev;
     bool is_ipv4;
 
+    if (!strncmp(output_bridge, "kube-ipvs0", 10)) {
+        VLOG_DBG_RL(&rl, "skip getting source address for device kube-ipvs0");
+        return 0;
+    }
+
     err = netdev_open(output_bridge, NULL, &dev);
     if (err) {
         return err;
