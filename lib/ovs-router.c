@@ -191,6 +191,7 @@ ovs_router_get_netdev_source_address(const struct in6_addr *ip6_dst,
 
     is_ipv4 = IN6_IS_ADDR_V4MAPPED(ip6_dst);
 
+    VLOG_INFO("ovs_router_get_netdev_source_address for dev %s with %d addresses", output_bridge, n_in6);
     for (i = 0; i < n_in6; i++) {
         struct in6_addr a1, a2;
         int mask_bits;

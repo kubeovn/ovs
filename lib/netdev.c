@@ -2222,6 +2222,9 @@ netdev_linux_get_addr_list(struct hmap **addr_list)
     struct linux_addr_list *all_addrs = NULL;
     struct linux_addr_list **p = &all_addrs;
 
+    struct ds s;
+    ds_init(&s);
+
     ofpbuf_use_stub(&buf, reply_stub, sizeof reply_stub);
     while (nl_dump_next(&dump, &reply, &buf)) {
         bool parsed, ipv4 = false;
@@ -2265,7 +2268,7 @@ netdev_linux_get_addr_list(struct hmap **addr_list)
                                      NLMSG_HDRLEN + sizeof(struct ifaddrmsg),
                                      policy6, attrs, ARRAY_SIZE(policy6));
         } else {
-            VLOG_DBG_RL(&rl,
+            VLOG_INFO_RL(&rl,
                         "received non AF_INET/AF_INET6"
                         "rtnetlink address message");
             goto out;
@@ -2277,12 +2280,18 @@ netdev_linux_get_addr_list(struct hmap **addr_list)
             if (ipv4) {
                 ovs_be32 addr = nl_attr_get_be32(attrs[IFA_ADDRESS]);
                 ovs_be32 mask = be32_prefix_mask(msg->ifa_prefixlen);
+                ip_format_masked(addr, mask, &s);
                 (*p)->addr = in6_addr_mapped_ipv4(addr);
                 (*p)->mask = in6_addr_mapped_ipv4(mask);
             } else {
                 (*p)->addr = nl_attr_get_in6_addr(attrs[IFA_ADDRESS]);
                 (*p)->mask = ipv6_create_mask(msg->ifa_prefixlen);
+                ipv6_format_masked(&(*p)->addr, &(*p)->mask, &s);
             }
+            if (msg->ifa_index != 2) {
+                VLOG_INFO("interface %d has ip %s", msg->ifa_index, ds_cstr_ro(&s));
+            }
+            ds_clear(&s);
             p = &((*p)->next);
 
             struct netdev_linux_addr_list *list;
@@ -2297,7 +2306,7 @@ netdev_linux_get_addr_list(struct hmap **addr_list)
                 list->count += 1;
             }
         } else {
-            VLOG_DBG_RL(&rl, "received unparseable rtnetlink address message");
+            VLOG_INFO_RL(&rl, "received unparseable rtnetlink address message");
             goto out;
         }
     }
@@ -2332,11 +2341,33 @@ netdev_get_addrs_list_flush(void)
     ovs_mutex_lock(&if_addr_list_lock);
     if (if_addr_list) {
         struct netdev_linux_addr_list *list;
+        struct ds s1, s2;
+        ds_init(&s1);
+        ds_init(&s2);
         HMAP_FOR_EACH_SAFE (list, hmap_node, if_addr_list) {
+            if (IN6_IS_ADDR_V4MAPPED(&list->addr_array[0])) { 
+                ip_format_masked(in6_addr_get_mapped_ipv4(&list->addr_array[0]), in6_addr_get_mapped_ipv4(&list->mask_array[0]), &s1);
+            } else {
+                ipv6_format_masked(&list->addr_array[0], &list->mask_array[0], &s1);
+            }
+
+            if (IN6_IS_ADDR_V4MAPPED(&list->addr_array[list->count-1])) { 
+                ip_format_masked(in6_addr_get_mapped_ipv4(&list->addr_array[list->count-1]), in6_addr_get_mapped_ipv4(&list->mask_array[list->count-1]), &s2);
+            } else {
+                ipv6_format_masked(&list->addr_array[list->count-1], &list->mask_array[list->count-1], &s2);
+            }
+
+            VLOG_INFO("interface %d has %d ip(s): %s ... %s",
+                      list->if_index, list->count,
+                      ds_cstr_ro(&s1), ds_cstr_ro(&s2));
+            ds_clear(&s1);
+            ds_clear(&s2);
             free(list->addr_array);
             free(list->mask_array);
             free(list);
         }
+        ds_destroy(&s1);
+        ds_destroy(&s2);
         hmap_destroy(if_addr_list);
         free(if_addr_list);
         if_addr_list = NULL;
@@ -2379,6 +2410,30 @@ netdev_get_addrs(const int ifindex, struct in6_addr **paddr,
         *n_in = cnt;
         *paddr = addr_array;
         *pmask = mask_array;
+        if (cnt) {
+            struct ds s1, s2;
+            ds_init(&s1);
+            ds_init(&s2);
+            if (IN6_IS_ADDR_V4MAPPED(&addr_array[0])) { 
+                ip_format_masked(in6_addr_get_mapped_ipv4(&addr_array[0]), in6_addr_get_mapped_ipv4(&mask_array[0]), &s1);
+            } else {
+                ipv6_format_masked(&addr_array[0], &mask_array[0], &s1);
+            }
+            if (IN6_IS_ADDR_V4MAPPED(&addr_array[cnt-1])) { 
+                ip_format_masked(in6_addr_get_mapped_ipv4(&addr_array[cnt-1]), in6_addr_get_mapped_ipv4(&mask_array[cnt-1]), &s2);
+            } else {
+                ipv6_format_masked(&addr_array[cnt-1], &mask_array[cnt-1], &s2);
+            }
+
+            VLOG_INFO("found %d ip(s) on interface %d: %s ... %s",
+                    cnt, ifindex, ds_cstr_ro(&s1), ds_cstr_ro(&s2));
+            ds_clear(&s1);
+            ds_clear(&s2);
+            ds_destroy(&s1);
+            ds_destroy(&s2);
+        } else {
+            VLOG_INFO("NO ip found on interface %d", ifindex);
+        }
     } else {
         free(addr_array);
         free(mask_array);
