@@ -3974,6 +3974,13 @@ codel_install__(struct netdev *netdev_, uint32_t target, uint32_t limit,
     struct netdev_linux *netdev = netdev_linux_cast(netdev_);
     struct codel *codel;
 
+    if (netdev->tc) {
+        if (netdev->tc->ops->tc_destroy) {
+            netdev->tc->ops->tc_destroy(netdev->tc);
+        }
+        netdev->tc = NULL;
+    }
+
     codel = xmalloc(sizeof *codel);
     tc_init(&codel->tc, &tc_ops_codel);
     codel->target = target;
@@ -4184,6 +4191,13 @@ fqcodel_install__(struct netdev *netdev_, uint32_t target, uint32_t limit,
 {
     struct netdev_linux *netdev = netdev_linux_cast(netdev_);
     struct fqcodel *fqcodel;
+
+    if (netdev->tc) {
+        if (netdev->tc->ops->tc_destroy) {
+            netdev->tc->ops->tc_destroy(netdev->tc);
+        }
+        netdev->tc = NULL;
+    }
 
     fqcodel = xmalloc(sizeof *fqcodel);
     tc_init(&fqcodel->tc, &tc_ops_fqcodel);
@@ -4407,6 +4421,13 @@ sfq_install__(struct netdev *netdev_, uint32_t quantum, uint32_t perturb)
     struct netdev_linux *netdev = netdev_linux_cast(netdev_);
     struct sfq *sfq;
 
+    if (netdev->tc) {
+        if (netdev->tc->ops->tc_destroy) {
+            netdev->tc->ops->tc_destroy(netdev->tc);
+        }
+        netdev->tc = NULL;
+    }
+
     sfq = xmalloc(sizeof *sfq);
     tc_init(&sfq->tc, &tc_ops_sfq);
     sfq->perturb = perturb;
@@ -4581,6 +4602,13 @@ netem_install__(struct netdev *netdev_, uint32_t latency,
 {
     struct netdev_linux *netdev = netdev_linux_cast(netdev_);
     struct netem *netem;
+
+    if (netdev->tc) {
+        if (netdev->tc->ops->tc_destroy) {
+            netdev->tc->ops->tc_destroy(netdev->tc);
+        }
+        netdev->tc = NULL;
+    }
 
     netem = xmalloc(sizeof *netem);
     tc_init(&netem->tc, &tc_ops_netem);
@@ -4771,6 +4799,13 @@ htb_install__(struct netdev *netdev_, uint64_t max_rate)
 {
     struct netdev_linux *netdev = netdev_linux_cast(netdev_);
     struct htb *htb;
+
+    if (netdev->tc) {
+        if (netdev->tc->ops->tc_destroy) {
+            netdev->tc->ops->tc_destroy(netdev->tc);
+        }
+        netdev->tc = NULL;
+    }
 
     htb = xmalloc(sizeof *htb);
     tc_init(&htb->tc, &tc_ops_htb);
@@ -5280,6 +5315,13 @@ hfsc_install__(struct netdev *netdev_, uint32_t max_rate)
     struct netdev_linux *netdev = netdev_linux_cast(netdev_);
     struct hfsc *hfsc;
 
+    if (netdev->tc) {
+        if (netdev->tc->ops->tc_destroy) {
+            netdev->tc->ops->tc_destroy(netdev->tc);
+        }
+        netdev->tc = NULL;
+    }
+
     hfsc = xmalloc(sizeof *hfsc);
     tc_init(&hfsc->tc, &tc_ops_hfsc);
     hfsc->max_rate = max_rate;
@@ -5751,6 +5793,13 @@ noop_install__(struct netdev *netdev_)
     struct netdev_linux *netdev = netdev_linux_cast(netdev_);
     static const struct tc tc = TC_INITIALIZER(&tc, &tc_ops_default);
 
+    if (netdev->tc) {
+        if (netdev->tc->ops->tc_destroy) {
+            netdev->tc->ops->tc_destroy(netdev->tc);
+        }
+        netdev->tc = NULL;
+    }
+
     netdev->tc = CONST_CAST(struct tc *, &tc);
 }
 
@@ -5785,6 +5834,13 @@ default_install__(struct netdev *netdev_)
 {
     struct netdev_linux *netdev = netdev_linux_cast(netdev_);
     static const struct tc tc = TC_INITIALIZER(&tc, &tc_ops_default);
+
+    if (netdev->tc) {
+        if (netdev->tc->ops->tc_destroy) {
+            netdev->tc->ops->tc_destroy(netdev->tc);
+        }
+        netdev->tc = NULL;
+    }
 
     /* Nothing but a tc class implementation is allowed to write to a tc.  This
      * class never does that, so we can legitimately use a const tc object. */
