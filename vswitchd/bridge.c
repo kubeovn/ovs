@@ -2178,6 +2178,7 @@ bridge_configure_mac_table(struct bridge *br)
 {
     const struct smap *oc = &br->cfg->other_config;
     int idle_time = smap_get_int(oc, "mac-aging-time", 0);
+    bool fallback = smap_get_bool(oc, "mac-learning-fallback", false);
     if (!idle_time) {
         idle_time = MAC_ENTRY_DEFAULT_IDLE_TIME;
     }
@@ -2187,7 +2188,8 @@ bridge_configure_mac_table(struct bridge *br)
         mac_table_size = MAC_DEFAULT_MAX;
     }
 
-    ofproto_set_mac_table_config(br->ofproto, idle_time, mac_table_size);
+    ofproto_set_mac_table_config(br->ofproto, idle_time,
+                                 fallback, mac_table_size);
 }
 
 /* Set multicast snooping table configuration for 'br'. */
