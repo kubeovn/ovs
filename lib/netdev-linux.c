@@ -3533,19 +3533,15 @@ netdev_linux_get_addr_list(const struct netdev *netdev_,
                           struct in6_addr **addr, struct in6_addr **mask, int *n_cnt)
 {
     struct netdev_linux *netdev = netdev_linux_cast(netdev_);
+    int ifindex;
     int error;
 
-    ovs_mutex_lock(&netdev->mutex);
-    if (netdev_linux_netnsid_is_remote(netdev)) {
-        error = EOPNOTSUPP;
-        goto exit;
+    error = get_ifindex(netdev, &ifindex);
+    if (error) {
+        return error;
     }
 
-    error = netdev_get_addrs(netdev_get_name(netdev_), addr, mask, n_cnt);
-
-exit:
-    ovs_mutex_unlock(&netdev->mutex);
-    return error;
+    return netdev_get_addrs(ifindex, addr, mask, n_cnt);
 }
 
 static void
