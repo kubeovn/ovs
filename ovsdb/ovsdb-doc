@@ -22,9 +22,9 @@ import ovs.json
 from ovs.db import error
 import ovs.db.schema
 
-from ovs_build_helpers.nroff import block_xml_to_nroff
-from ovs_build_helpers.nroff import escape_nroff_literal
-from ovs_build_helpers.nroff import text_to_nroff
+from build.nroff import block_xml_to_nroff
+from build.nroff import escape_nroff_literal
+from build.nroff import text_to_nroff
 
 argv0 = sys.argv[0]
 

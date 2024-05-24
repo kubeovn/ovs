@@ -14,9 +14,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from build import soutil
 import sys
-
-from ovs_build_helpers import soutil
 
 
 def sodepends(include_dirs, filenames, dst):
