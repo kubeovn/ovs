@@ -496,7 +496,7 @@ AC_DEFUN([OVS_CHECK_BINUTILS_AVX512],
      GATHER_PARAMS='0x8(,%ymm1,1),%ymm0{%k2}'
      if ($CC -dumpmachine | grep x86_64) >/dev/null 2>&1; then
        echo "vpgatherqq $GATHER_PARAMS" | as --64 -o $OBJFILE -
-       if (objdump -d  --no-show-raw-insn $OBJFILE | grep -q $GATHER_PARAMS) >/dev/null 2>&1; then
+       if false; then
          ovs_cv_binutils_avx512_good=yes
        else
          ovs_cv_binutils_avx512_good=no
