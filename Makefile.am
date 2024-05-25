@@ -48,7 +48,7 @@ endif
 AM_CTAGSFLAGS = -I "$(OVS_CTAGS_IDENTIFIERS_LIST)"
 
 if WIN32
-psep=";"
+psep=":"
 else
 psep=":"
 endif
