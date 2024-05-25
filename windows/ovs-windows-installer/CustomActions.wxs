@@ -33,7 +33,7 @@
               JScriptCall="runCommandAction" Execute="deferred" Return="check" Impersonate="no" />
 
     <CustomAction Id="InitializeDB_Prop" Property="InitializeDB"
-                  Value='"[BINARIESDIR]ovs-vsctl.exe" --no-wait --db=unix:"[APPDATADIR]db.sock" init|0|ovs-vsctl failed to initialize the database'
+                  Value='"[BINARIESDIR]ovs-vsctl.exe" --no-wait --db=tcp:127.0.0.1:6640 init|0|ovs-vsctl failed to initialize the database'
                   Execute="immediate" />
     <CustomAction Id="InitializeDB"
               BinaryKey="OVSActions"
