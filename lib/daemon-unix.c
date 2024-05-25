@@ -61,6 +61,8 @@ VLOG_DEFINE_THIS_MODULE(daemon_unix);
 bool detach;                    /* Was --detach specified? */
 static bool detached;           /* Have we already detached? */
 
+bool no_setsid = false;
+
 /* --pidfile: Name of pidfile (null if none). */
 char *pidfile;
 
@@ -127,6 +129,12 @@ void
 set_detach(void)
 {
     detach = true;
+}
+
+void
+set_no_setsid(void)
+{
+    no_setsid = true;
 }
 
 /* Sets up a following call to daemonize() to fork a supervisory process to
@@ -465,7 +473,9 @@ daemonize_start(bool access_datapath)
         }
 
         /* Running in daemon or monitor process. */
-        setsid();
+        if (!no_setsid) {
+            setsid();
+        }
     }
 
     if (monitor) {
@@ -542,6 +552,8 @@ daemon_usage(void)
     printf(
         "\nDaemon options:\n"
         "  --detach                run in background as daemon\n"
+        "  --no-setsid             do not create a session nor set the "
+                                   "process group ID\n"
         "  --monitor               creates a process to monitor this daemon\n"
         "  --user=username[:group] changes the effective daemon user:group\n"
         "  --no-chdir              do not chdir to '/'\n"

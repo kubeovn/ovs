@@ -148,6 +148,9 @@ do_start_ovsdb () {
         if test X"$SELF_CONFINEMENT" = Xno; then
             set "$@" --no-self-confinement
         fi
+        if test X"$SETSID" = Xno; then
+            set "$@" --no-setsid
+        fi
         set "$@" -vconsole:emer -vsyslog:err -vfile:info
         set "$@" --remote=punix:"$DB_SOCK"
         set "$@" --private-key=db:Open_vSwitch,SSL,private_key
@@ -339,6 +342,7 @@ set_defaults () {
     MLOCKALL=yes
     SELF_CONFINEMENT=yes
     MONITOR=yes
+    SETSID=yes
     OVS_USER=
     OVSDB_SERVER=yes
     OVS_VSWITCHD=yes

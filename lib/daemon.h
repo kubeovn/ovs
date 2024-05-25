@@ -39,6 +39,7 @@
 #ifndef _WIN32
 #define DAEMON_OPTION_ENUMS                     \
     OPT_DETACH,                                 \
+    OPT_NO_SETSID,                              \
     OPT_NO_SELF_CONFINEMENT,                    \
     OPT_NO_CHDIR,                               \
     OPT_OVERWRITE_PIDFILE,                      \
@@ -48,6 +49,7 @@
 
 #define DAEMON_LONG_OPTIONS                                              \
         {"detach",            no_argument, NULL, OPT_DETACH},            \
+        {"no-setsid",         no_argument, NULL, OPT_NO_SETSID},         \
         {"no-self-confinement", no_argument, NULL, OPT_NO_SELF_CONFINEMENT}, \
         {"no-chdir",          no_argument, NULL, OPT_NO_CHDIR},          \
         {"pidfile",           optional_argument, NULL, OPT_PIDFILE},     \
@@ -58,6 +60,10 @@
 #define DAEMON_OPTION_HANDLERS                  \
         case OPT_DETACH:                        \
             set_detach();                       \
+            break;                              \
+                                                \
+        case OPT_NO_SETSID:                     \
+            set_no_setsid();                    \
             break;                              \
                                                 \
         case OPT_NO_SELF_CONFINEMENT:           \
@@ -94,6 +100,7 @@
         case OPT_USER_GROUP:
 
 void set_detach(void);
+void set_no_setsid(void);
 void daemon_set_monitor(void);
 void set_no_chdir(void);
 void ignore_existing_pidfile(void);
