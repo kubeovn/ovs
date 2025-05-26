@@ -371,7 +371,7 @@ extern struct seq *tnl_conf_seq;
 
 #ifndef _WIN32
 void netdev_get_addrs_list_flush(void);
-int netdev_get_addrs(const char dev[], struct in6_addr **paddr,
+int netdev_get_addrs(const int ifindex, struct in6_addr **paddr,
                      struct in6_addr **pmask, int *n_in6);
 #endif
 
