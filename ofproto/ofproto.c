@@ -757,11 +757,11 @@ ofproto_set_forward_bpdu(struct ofproto *ofproto, bool forward_bpdu)
  * 'max_entries'. */
 void
 ofproto_set_mac_table_config(struct ofproto *ofproto, unsigned idle_time,
-                             size_t max_entries)
+                             bool fallback, size_t max_entries)
 {
     if (ofproto->ofproto_class->set_mac_table_config) {
         ofproto->ofproto_class->set_mac_table_config(ofproto, idle_time,
-                                                     max_entries);
+                                                     fallback, max_entries);
     }
 }
 
