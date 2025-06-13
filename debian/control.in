@@ -46,7 +46,6 @@ Architecture: linux-any
 Depends:
  openssl,
  ${misc:Depends},
- ${python3:Depends},
  ${shlibs:Depends},
 Suggests:
  ethtool,
@@ -154,11 +153,8 @@ Depends:
  netbase,
  openvswitch-common (= ${binary:Version}),
  procps,
- python3-netifaces,
- python3-openvswitch (>= ${source:Version}),
  uuid-runtime,
  ${misc:Depends},
- ${python3:Depends},
  ${shlibs:Depends},
 Breaks:
  openvswitch-common (<< 2.17~),
