@@ -585,6 +585,39 @@ do_db_local_address(struct ovs_cmdl_context *ctx)
 }
 
 static void
+do_db_raft_header(struct ovs_cmdl_context *ctx)
+{
+    const char *db_file_name = ctx->argv[1];
+    struct ovsdb_log *log;
+
+    check_ovsdb_error(ovsdb_log_open(db_file_name, OVSDB_MAGIC"|"RAFT_MAGIC,
+                                     OVSDB_LOG_READ_ONLY, -1, &log));
+    if (strcmp(ovsdb_log_get_magic(log), RAFT_MAGIC)) {
+        ovs_fatal(0, "%s: not a clustered database", db_file_name);
+    }
+
+    struct json *header;
+    check_ovsdb_error(ovsdb_log_read(log, &header));
+    ovsdb_log_close(log);
+
+    struct raft_header h;
+    check_ovsdb_error(raft_header_from_json(&h, header));
+    json_destroy(header);
+    raft_entry_uninit(&h.snap);
+    h.snap.data.full_json = NULL;
+    h.snap.data.serialized = NULL;
+    h.snap.servers = NULL;
+    h.snap_index = 0;
+
+    header = raft_header_to_json(&h);
+    raft_header_uninit(&h);
+    char *s = json_to_string(header, JSSF_PRETTY);
+    json_destroy(header);
+    puts(s);
+    free(s);
+}
+
+static void
 do_db_has_magic(struct ovs_cmdl_context *ctx, const char *magic)
 {
     const char *filename = ctx->argv[1];
@@ -2162,6 +2195,7 @@ static const struct ovs_cmdl_command all_commands[] = {
     { "db-cid", "db", 1, 1, do_db_cid, OVS_RO },
     { "db-sid", "db", 1, 1, do_db_sid, OVS_RO },
     { "db-local-address", "db", 1, 1, do_db_local_address, OVS_RO },
+    { "db-raft-header", "db", 1, 1, do_db_raft_header, OVS_RO },
     { "db-is-clustered", "db", 1, 1, do_db_is_clustered, OVS_RO },
     { "db-is-standalone", "db", 1, 1, do_db_is_standalone, OVS_RO },
     { "schema-name", "[schema]", 0, 1, do_schema_name, OVS_RO },
