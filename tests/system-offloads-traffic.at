@@ -838,7 +838,6 @@ OVS_TRAFFIC_VSWITCHD_STOP(["/could not open network device ovs-p0/d
 AT_CLEANUP
 
 AT_SETUP([offloads - ping over vxlan tunnel with gbp - offloads enabled])
-OVS_CHECK_TUNNEL_TSO()
 OVS_CHECK_VXLAN()
 
 OVS_TRAFFIC_VSWITCHD_START([], [], [-- set Open_vSwitch . other_config:hw-offload=true])

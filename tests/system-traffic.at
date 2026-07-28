@@ -448,7 +448,6 @@ OVS_TRAFFIC_VSWITCHD_STOP
 AT_CLEANUP
 
 AT_SETUP([datapath - ping vlan over vxlan tunnel])
-OVS_CHECK_TUNNEL_TSO()
 OVS_CHECK_VXLAN()
 
 OVS_TRAFFIC_VSWITCHD_START()
@@ -1188,7 +1187,6 @@ AT_CHECK([ovs-pcap p0.pcap | grep -Eq "^[[[:xdigit:]]]{24}86dd60000000003a1140fc
 AT_CLEANUP
 
 AT_SETUP([datapath - bridging two geneve tunnels])
-OVS_CHECK_TUNNEL_TSO()
 OVS_CHECK_GENEVE()
 
 OVS_TRAFFIC_VSWITCHD_START()
@@ -1265,7 +1263,6 @@ OVS_TRAFFIC_VSWITCHD_STOP
 AT_CLEANUP
 
 AT_SETUP([datapath - bridging IPv4 and IPv6 flow based geneve tunnels])
-OVS_CHECK_TUNNEL_TSO()
 OVS_CHECK_GENEVE()
 
 OVS_TRAFFIC_VSWITCHD_START()
