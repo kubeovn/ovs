@@ -215,6 +215,11 @@ ovs_router_lookup(uint32_t mark, const struct in6_addr *ip6_dst,
             (!IN6_IS_ADDR_V4MAPPED(from_src) && rule->ipv4)) {
             continue;
         }
+    if (!strcmp(output_bridge, "kube-ipvs0")) {
+        VLOG_DBG_RL(&rl, "skip getting source address for device kube-ipvs0");
+        return 0;
+    }
+
 
         matched = (!rule->src_prefix ||
                    ipv6_addr_equals_masked(&rule->from_addr, from_src, plen));

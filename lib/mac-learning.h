@@ -168,6 +168,7 @@ struct mac_learning {
     struct ovs_refcount ref_cnt;
     struct ovs_rwlock rwlock;
     bool need_revalidate;
+    bool fallback;              /* fallback to legacy mode */
 
     /* Statistics */
     uint64_t total_learned;

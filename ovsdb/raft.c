@@ -206,7 +206,7 @@ struct raft {
      * most recently added to 'log'. */
     struct hmap servers;
 
-#define ELECTION_BASE_MSEC 1000
+#define ELECTION_BASE_MSEC 5000
 #define ELECTION_RANGE_MSEC 1000
 #define ELECTION_MIN_MSEC 100
 #define ELECTION_MAX_MSEC 600000
@@ -592,7 +592,7 @@ struct ovsdb_error * OVS_WARN_UNUSED_RESULT
 raft_join_cluster(const char *file_name,
                   const char *name, const char *local_address,
                   const struct sset *remote_addresses,
-                  const struct uuid *cid)
+                  const struct uuid *cid, const struct uuid *sid)
 {
     ovs_assert(!sset_is_empty(remote_addresses));
 
@@ -617,6 +617,9 @@ raft_join_cluster(const char *file_name,
     if (cid && uuid_is_zero(cid)) {
         return ovsdb_error(NULL, "all-zero UUID is not valid cluster ID");
     }
+    if (sid && uuid_is_zero(sid)) {
+        return ovsdb_error(NULL, "all-zero UUID is not valid server ID");
+    }
 
     /* Create log file. */
     struct ovsdb_log *log;
@@ -628,7 +631,7 @@ raft_join_cluster(const char *file_name,
 
     /* Write log file. */
     struct raft_header h = {
-        .sid = uuid_random(),
+        .sid = sid ? *sid : uuid_random(),
         .cid = cid ? *cid : UUID_ZERO,
         .name = xstrdup(name),
         .local_address = xstrdup(local_address),
