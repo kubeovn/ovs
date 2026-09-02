@@ -2108,7 +2108,7 @@ do_fix_cluster(struct ovs_cmdl_context *ctx)
 
     for (size_t i = 0; i < c.n_servers; i++) {
         struct server *s = &c.servers[i];
-        check_ovsdb_error(ovsdb_log_replace(s->log, c.entries[i]->array.elems, c.n_entries[i]));
+        check_ovsdb_error(ovsdb_log_replace(s->log, c.entries[i]->array.elements, c.n_entries[i]));
         ovsdb_log_close(s->log);
         s->log = NULL;
 

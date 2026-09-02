@@ -3599,7 +3599,7 @@ netdev_linux_get_addr_list(const struct netdev *netdev_,
     int ifindex;
     int error;
 
-    error = get_ifindex(netdev, &ifindex);
+    error = get_ifindex(netdev_, &ifindex);
     if (error) {
         return error;
     }
